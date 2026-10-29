@@ -19,6 +19,7 @@ The analysis covers the highest-paying remote Data Analyst postings, the skills 
 - **Visual Studio Code (VS Code)** as the working environment used to load data into the database, write SQL scripts, and send queries to PostgreSQL.
 - **PostgreSQL** as the relational database management system where the job-posting data is stored.
 - **SQL** as the query language used in VS Code to retrieve, filter, join, and analyse the data stored in PostgreSQL.
+- **ChatGPT** as an AI assistant used to support the project workflow, including refining explanations, documenting the analysis, and improving the README.
 - **Joins** to connect job postings, company information, and skill records.
 - **Common Table Expressions (CTEs)** to organise multi-step analysis.
 - **Aggregate functions** such as COUNT, AVG, and ROUND.
