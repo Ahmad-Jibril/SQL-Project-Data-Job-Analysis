@@ -269,11 +269,51 @@ SQL appeared most often in the returned skill records, followed by Python and Ta
 
 ### 3. Most In-Demand Skills
 
-The third query ranks skills by their frequency across Data Analyst job postings. Its results should be used to identify commonly requested skills across the dataset, rather than only within remote roles, because this query does not apply a remote-work filter.
+The third query identifies the five most frequently requested skills across Data Analyst job postings in the dataset. It counts job-skill records and ranks skills by demand.
+
+| Skill | Total demand count |
+|---|---:|
+| SQL | 92,628 |
+| Excel | 67,031 |
+| Python | 57,326 |
+| Tableau | 46,554 |
+| Power BI | 39,468 |
+
+**Insight:** SQL leads this list with 92,628 demand records, followed by Excel and Python. This suggests that querying databases, spreadsheet analysis, and programming are prominent skill areas in the dataset. Tableau and Power BI also rank highly, highlighting the importance of data visualisation and reporting. These are overall Data Analyst results, not remote-only results, because this query does not apply a remote-work filter.
 
 ### 4. Skills Associated With Higher Average Salaries
 
-The fourth query calculates average annual salary by skill for Data Analyst postings with reported salaries, regardless of location. These values indicate an association between a skill and the salaries of postings that mention it; they do not prove that the skill itself causes higher pay.
+The fourth query calculates average annual salary by skill for Data Analyst postings with reported salaries, regardless of location. The 25 highest average salary results returned by the query are shown below.
+
+| Skill | Average annual salary (USD) |
+|---|---:|
+| SVN | $400,000.00 |
+| Solidity | $179,000.00 |
+| Couchbase | $160,515.00 |
+| DataRobot | $155,485.50 |
+| Golang | $155,000.00 |
+| MXNet | $149,000.00 |
+| dplyr | $147,633.33 |
+| VMware | $147,500.00 |
+| Terraform | $146,733.83 |
+| Twilio | $138,500.00 |
+| GitLab | $134,126.00 |
+| Kafka | $129,999.16 |
+| Puppet | $129,820.00 |
+| Keras | $127,013.33 |
+| PyTorch | $125,226.20 |
+| Perl | $124,685.75 |
+| Ansible | $124,370.00 |
+| Hugging Face | $123,950.00 |
+| TensorFlow | $120,646.83 |
+| Cassandra | $118,406.68 |
+| Notion | $118,091.67 |
+| Atlassian | $117,965.60 |
+| Bitbucket | $116,711.75 |
+| Airflow | $116,387.26 |
+| Scala | $115,479.53 |
+
+**Insight:** SVN has the highest average salary in this output at $400,000, but an unusually high average may reflect a small number of postings or an outlier rather than a broadly available salary. Several skills associated with data engineering, machine learning, infrastructure, and workflow orchestration also appear near the top. These figures show associations between skills and salaries in the dataset; they do not prove that a skill causes higher pay. Since the query does not show how many postings contributed to each average, consider checking sample sizes before using this ranking to choose what to learn.
 
 ### 5. Skills Combining Demand and Salary
 
