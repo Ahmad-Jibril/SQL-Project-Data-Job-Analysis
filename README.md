@@ -36,6 +36,195 @@ The SQL scripts are available in the [project_sql](project_sql/) folder.
 | [4_top_paying_skill.sql](project_sql/4_top_paying_skill.sql) | Ranks skills by average annual salary across Data Analyst postings with reported salaries. |
 | [5_optimal_skills.sql](project_sql/5_optimal_skills.sql) | Compares skill demand and average salary among remote Data Analyst postings with reported salaries. |
 
+## SQL Queries for Each Business Question
+
+The following SQL queries show how each business question was answered. They were written in **VS Code** and executed against the data stored in **PostgreSQL**. Each query is also available as a separate file in the [`project_sql`](project_sql/) folder.
+
+### Business Question 1: What are the 10 highest-paying remote Data Analyst job postings with reported annual average salaries?
+
+This query joins job postings to company information, filters for remote postings labelled `Anywhere`, excludes postings without a reported annual average salary, and returns the 10 highest salaries.
+
+```sql
+SELECT 
+    job_id,
+    name AS company_name, 
+    job_title_short,
+    job_location,
+    job_schedule_type,
+    salary_year_avg,
+    job_posted_date
+FROM
+    job_postings_fact
+LEFT JOIN
+    company_dim
+    ON company_dim.company_id = job_postings_fact.company_id
+WHERE
+    job_location = 'Anywhere' AND
+    job_title_short = 'Data Analyst' AND
+    salary_year_avg IS NOT NULL
+ORDER BY
+    salary_year_avg DESC
+LIMIT 10;
+```
+
+[View the full SQL script](project_sql/1_top_paying_jobs.sql).
+
+### Business Question 2: Which skills are listed for these highest-paying roles?
+
+A Common Table Expression (CTE) first identifies the 10 highest-paying remote Data Analyst postings. The query then joins those postings to the job-skill mapping and skills tables to retrieve their associated skills.
+
+```sql
+WITH top_paying_jobs AS (
+    SELECT 
+        job_id, 
+        job_title_short,
+        salary_year_avg,
+        name AS company_name
+    FROM
+        job_postings_fact
+    LEFT JOIN
+        company_dim
+        ON company_dim.company_id = job_postings_fact.company_id
+    WHERE
+        job_location = 'Anywhere' AND
+        job_title_short = 'Data Analyst' AND
+        salary_year_avg IS NOT NULL
+    ORDER BY
+        salary_year_avg DESC
+    LIMIT 10
+)
+SELECT 
+   top_paying_jobs.*,
+   skills
+FROM
+    top_paying_jobs
+INNER JOIN
+    skills_job_dim
+    ON top_paying_jobs.job_id = skills_job_dim.job_id
+INNER JOIN
+    skills_dim
+    ON skills_job_dim.skill_id = skills_dim.skill_id;
+```
+
+[View the full SQL script](project_sql/2_top_paying_job_skills.sql).
+
+### Business Question 3: Which skills appear most frequently in Data Analyst job postings?
+
+This query joins job postings to their associated skills, counts job-skill records for each skill, sorts the results by demand, and returns the top five. It covers Data Analyst postings generally, not remote roles only.
+
+```sql
+SELECT
+    skills,
+    COUNT(job_postings_fact.job_id) AS demand_count
+FROM 
+    job_postings_fact
+INNER JOIN
+    skills_job_dim
+    ON job_postings_fact.job_id = skills_job_dim.job_id
+INNER JOIN
+    skills_dim
+    ON skills_job_dim.skill_id = skills_dim.skill_id
+WHERE 
+    job_title_short = 'Data Analyst'
+GROUP BY 
+    skills
+ORDER BY
+    demand_count DESC
+LIMIT 5;
+```
+
+[View the full SQL script](project_sql/3_top_demanded_skills.sql).
+
+### Business Question 4: Which skills are associated with the highest average salaries for Data Analyst roles?
+
+This query calculates the average reported annual salary for Data Analyst postings associated with each skill. It excludes postings without salary data and returns the top 25 skills by average salary, regardless of location.
+
+```sql
+SELECT 
+    skills,
+    ROUND(AVG(job_postings_fact.salary_year_avg), 2) AS average_salary
+FROM
+    job_postings_fact
+INNER JOIN
+    skills_job_dim
+    ON skills_job_dim.job_id = job_postings_fact.job_id
+INNER JOIN
+    skills_dim
+    ON skills_dim.skill_id = skills_job_dim.skill_id
+WHERE
+    job_title_short = 'Data Analyst' AND
+    salary_year_avg IS NOT NULL
+GROUP BY
+    skills
+ORDER BY
+    average_salary DESC
+LIMIT 25;
+```
+
+[View the full SQL script](project_sql/4_top_paying_skill.sql).
+
+### Business Question 5: Which skills combine relatively high demand with attractive average salaries in remote Data Analyst postings?
+
+Two CTEs calculate skill demand and average salary for remote Data Analyst postings with reported salaries. The results are joined by skill ID and ranked by demand first, then average salary.
+
+```sql
+WITH skills_demand AS (
+    SELECT
+        skills_job_dim.skill_id,
+        skills,
+        COUNT(job_postings_fact.job_id) AS demand_count
+    FROM
+        job_postings_fact
+    INNER JOIN
+        skills_job_dim
+        ON skills_job_dim.job_id = job_postings_fact.job_id
+    INNER JOIN
+        skills_dim
+        ON skills_dim.skill_id = skills_job_dim.skill_id
+    WHERE
+        job_title_short = 'Data Analyst'
+        AND job_work_from_home = TRUE
+        AND salary_year_avg IS NOT NULL
+    GROUP BY
+        skills_job_dim.skill_id,
+        skills
+), average_salary AS (
+    SELECT
+        skills_job_dim.skill_id,
+        skills,
+        ROUND(AVG(salary_year_avg), 2) AS avg_salary
+    FROM
+        job_postings_fact
+    INNER JOIN
+        skills_job_dim
+        ON skills_job_dim.job_id = job_postings_fact.job_id
+    INNER JOIN
+        skills_dim
+        ON skills_dim.skill_id = skills_job_dim.skill_id
+    WHERE
+        job_work_from_home = TRUE
+        AND job_title_short = 'Data Analyst'
+        AND salary_year_avg IS NOT NULL
+    GROUP BY
+        skills_job_dim.skill_id,
+        skills
+)
+SELECT
+    skills_demand.*,
+    avg_salary
+FROM
+    skills_demand
+INNER JOIN
+    average_salary
+    ON average_salary.skill_id = skills_demand.skill_id
+ORDER BY
+    demand_count DESC,
+    avg_salary DESC
+LIMIT 10;
+```
+
+[View the full SQL script](project_sql/5_optimal_skills.sql).
+
 ## Findings
 
 ### 1. Highest-Paying Remote Data Analyst Postings
