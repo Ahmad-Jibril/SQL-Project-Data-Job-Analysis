@@ -16,7 +16,9 @@ The analysis covers the highest-paying remote Data Analyst postings, the skills 
 
 ## Tools and SQL Techniques
 
-- **SQL** for querying and analysing relational job-posting data.
+- **Visual Studio Code (VS Code)** as the code editor used to write and organise the SQL scripts.
+- **PostgreSQL** as the relational database management system used to store and query the job-posting data, connected to VS Code.
+- **SQL** to query and analyse the data in PostgreSQL.
 - **Joins** to connect job postings, company information, and skill records.
 - **Common Table Expressions (CTEs)** to organise multi-step analysis.
 - **Aggregate functions** such as COUNT, AVG, and ROUND.
